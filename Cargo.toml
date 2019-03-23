@@ -1,0 +1,7 @@
+[package]
+name = "simmy-dimmy"
+version = "0.0.1"
+authors = ["Simon Salloum"]
+edition = "2018"
+
+[dependencies]
