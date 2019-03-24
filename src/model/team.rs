@@ -1,15 +1,23 @@
 #[derive(Debug)]
 pub struct Team {
   name: &'static str,
-  elo: u32
+  rating: f64
 }
 
 impl Team {
-  pub fn new(name: &'static str, elo: u32) -> Team {
+  pub fn new(name: &'static str, rating: f64) -> Team {
     Team {
       name: name,
-      elo: elo
+      rating: rating
     }
+  }
+
+  pub fn name(&self) -> &'static str {
+    self.name
+  }
+
+  pub fn rating(&self) -> f64 {
+    self.rating
   }
 }
 
