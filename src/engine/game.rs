@@ -12,8 +12,8 @@ pub enum Outcome {
 pub trait Result {
   fn home_team(&self) -> Team;
   fn away_team(&self) -> Team;
-  fn home_team_score(&self) -> u16;
-  fn away_team_score(&self) -> u16;
+  fn home_team_score(&self) -> u64;
+  fn away_team_score(&self) -> u64;
   fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     write!(f, "Data {{ ... }}")
   }
@@ -29,8 +29,8 @@ impl Debug for Result {
 pub struct WinLossResult {
   home_team: Team,
   away_team: Team,
-  home_team_score: u16,
-  away_team_score: u16,
+  home_team_score: u64,
+  away_team_score: u64,
   winner: Team,
   loser: Team,
 }
@@ -53,8 +53,8 @@ impl WinLossResult {
   pub fn new(
     home_team: Team,
     away_team: Team,
-    home_team_score: u16,
-    away_team_score: u16,
+    home_team_score: u64,
+    away_team_score: u64,
     winner: Team,
     loser: Team,
   ) -> WinLossResult {
@@ -76,10 +76,10 @@ impl Result for WinLossResult {
   fn away_team(&self) -> Team {
     self.away_team
   }
-  fn home_team_score(&self) -> u16 {
+  fn home_team_score(&self) -> u64 {
     self.home_team_score
   }
-  fn away_team_score(&self) -> u16 {
+  fn away_team_score(&self) -> u64 {
     self.away_team_score
   }
   fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -91,16 +91,16 @@ impl Result for WinLossResult {
 pub struct DrawResult {
   home_team: Team,
   away_team: Team,
-  home_team_score: u16,
-  away_team_score: u16,
+  home_team_score: u64,
+  away_team_score: u64,
 }
 
 impl DrawResult {
   pub fn new(
     home_team: Team,
     away_team: Team,
-    home_team_score: u16,
-    away_team_score: u16,
+    home_team_score: u64,
+    away_team_score: u64,
   ) -> DrawResult {
     DrawResult {
       home_team: home_team,
@@ -118,10 +118,10 @@ impl Result for DrawResult {
   fn away_team(&self) -> Team {
     self.away_team
   }
-  fn home_team_score(&self) -> u16 {
+  fn home_team_score(&self) -> u64 {
     self.home_team_score
   }
-  fn away_team_score(&self) -> u16 {
+  fn away_team_score(&self) -> u64 {
     self.away_team_score
   }
   fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
