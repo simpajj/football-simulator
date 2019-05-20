@@ -14,15 +14,15 @@ pub struct WinLossResult {
   home_team: Team,
   away_team: Team,
   home_team_score: u16,
-  away_team_score: u16
+  away_team_score: u16,
 }
 
 impl WinLossResult {
   fn winner(&self) -> Team {
     if self.home_team_score > self.away_team_score {
-      return self.home_team()
+      return self.home_team();
     } else {
-      return self.away_team()
+      return self.away_team();
     }
   }
 }
@@ -45,14 +45,14 @@ impl GameResult for WinLossResult {
 pub fn game(home_team: Team, away_team: Team) -> impl GameResult {
   let num = rand::thread_rng().gen_range(0, 10);
   if num < 5 {
-    WinLossResult{
+    WinLossResult {
       home_team: home_team,
       away_team: away_team,
       home_team_score: 1,
       away_team_score: 0,
     }
   } else {
-    WinLossResult{
+    WinLossResult {
       home_team: home_team,
       away_team: away_team,
       home_team_score: 0,
