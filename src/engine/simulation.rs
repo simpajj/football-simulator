@@ -4,7 +4,7 @@ use rand::prelude::*;
 use crate::engine::game;
 use crate::model::team::Team;
 
-const MatchImportance: f64 = 5.0;
+const MATCH_IMPORTANCE: f64 = 5.0;
 
 // http://www.worldcup-simulator.de/static/data/Dormagen_2014_World_Cup_Simulator_2014-05-29.pdf
 pub fn simulate_game<'a>(home_team: &'a Team, away_team: &'a Team) -> Box<game::Result> {
@@ -16,18 +16,18 @@ pub fn simulate_game<'a>(home_team: &'a Team, away_team: &'a Team) -> Box<game::
 
     match outcome {
         game::Outcome::HomeWin => {
-            let ht = Team::update_rating(home_team, MatchImportance, 1.0, p_home);
-            let at = Team::update_rating(away_team, MatchImportance, 0.0, p_away);
+            let ht = Team::update_rating(home_team, MATCH_IMPORTANCE, 1.0, p_home);
+            let at = Team::update_rating(away_team, MATCH_IMPORTANCE, 0.0, p_away);
             return Box::new(game::WinLossResult::new(ht, at, 1, 0, ht, at));
         }
         game::Outcome::AwayWin => {
-            let ht = Team::update_rating(home_team, MatchImportance, 0.0, p_home);
-            let at = Team::update_rating(away_team, MatchImportance, 1.0, p_away);
+            let ht = Team::update_rating(home_team, MATCH_IMPORTANCE, 0.0, p_home);
+            let at = Team::update_rating(away_team, MATCH_IMPORTANCE, 1.0, p_away);
             return Box::new(game::WinLossResult::new(ht, at, 0, 1, at, ht));
         }
         game::Outcome::Draw => {
-            let ht = Team::update_rating(home_team, MatchImportance, 0.0, p_home); // FIXME: score when updating elo
-            let at = Team::update_rating(away_team, MatchImportance, 0.0, p_away); // FIXME
+            let ht = Team::update_rating(home_team, MATCH_IMPORTANCE, 0.0, p_home); // FIXME: score when updating elo
+            let at = Team::update_rating(away_team, MATCH_IMPORTANCE, 0.0, p_away); // FIXME
             return Box::new(game::DrawResult::new(ht, at, 0, 0));
         }
     };

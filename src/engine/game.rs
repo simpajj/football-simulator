@@ -1,4 +1,5 @@
 use crate::model::team::Team;
+use std::fmt::Debug;
 extern crate rand;
 
 #[derive(Copy, Clone)]
@@ -13,6 +14,15 @@ pub trait Result {
   fn away_team(&self) -> Team;
   fn home_team_score(&self) -> u16;
   fn away_team_score(&self) -> u16;
+  fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "Data {{ ... }}")
+  }
+}
+
+impl Debug for Result {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    self.debug_fmt(f)
+  }
 }
 
 #[derive(Debug)]
@@ -72,6 +82,9 @@ impl Result for WinLossResult {
   fn away_team_score(&self) -> u16 {
     self.away_team_score
   }
+  fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    self.fmt(f)
+  }
 }
 
 #[derive(Debug)]
@@ -110,5 +123,8 @@ impl Result for DrawResult {
   }
   fn away_team_score(&self) -> u16 {
     self.away_team_score
+  }
+  fn debug_fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    self.fmt(f)
   }
 }
