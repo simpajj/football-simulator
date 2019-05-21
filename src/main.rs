@@ -1,17 +1,17 @@
 extern crate rand;
 extern crate simmy_dimmy;
 
+pub use simmy_dimmy::engine::league;
 pub use simmy_dimmy::engine::simulation;
 pub use simmy_dimmy::model::team::Team;
 
 use std::io;
 
 fn main() {
-    let team1 = &mut Team::new("a", 2128.0);
-    let team2 = &mut Team::new("b", 2094.0);
     loop {
-        let gr = simulation::simulate_game(team1, team2);
-        println!("{:?}", gr);
+        let l = league::League::new();
+        //let gr = simulation::simulate_game(team1, team2);
+        println!("{}", l);
         println!("Play another match? (Yes/no)");
 
         let mut input = String::new();

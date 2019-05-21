@@ -1,8 +1,18 @@
-#[derive(Debug, Clone, Copy)]
+use std::cmp::PartialEq;
+
+#[derive(Debug, Clone, Copy, PartialOrd)]
 pub struct Team {
-  name: &'static str,
+  pub name: &'static str,
   pub rating: f64,
 }
+
+impl PartialEq for Team {
+  fn eq(&self, other: &Self) -> bool {
+    self.name == other.name
+  }
+}
+
+impl Eq for Team {}
 
 impl Team {
   pub fn new(name: &'static str, rating: f64) -> Team {
