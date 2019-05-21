@@ -1,7 +1,9 @@
 use std::cmp::PartialEq;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, PartialOrd)]
 pub struct Team {
+  pub id: Uuid,
   pub name: &'static str,
   pub rating: f64,
 }
@@ -17,6 +19,7 @@ impl Eq for Team {}
 impl Team {
   pub fn new(name: &'static str, rating: f64) -> Team {
     Team {
+      id: Uuid::new_v4(),
       name: name,
       rating: rating,
     }

@@ -31,7 +31,7 @@ const TEAMS: [(&'static str, f64); 20] = [
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Debug)]
 pub struct TeamStats {
-    team: Team,
+    pub team: Team,
     wins: u16,
     draws: u16,
     losses: u16,
@@ -83,6 +83,7 @@ impl TeamStats {
 pub struct League {
     name: &'static str,
     num_teams: usize,
+    teams: Vec<Team>,
     pub standings: Vec<TeamStats>,
 }
 
@@ -111,13 +112,17 @@ impl Display for League {
 
 impl League {
     pub fn new() -> League {
-        let mut standings = Vec::new();
+        let mut standings: Vec<TeamStats> = Vec::new();
+        let mut teams: Vec<Team> = Vec::new();
         for team in TEAMS.iter() {
-            standings.push(TeamStats::new(Team::new(team.0, team.1)))
+            let team = Team::new(team.0, team.1);
+            standings.push(TeamStats::new(team));
+            teams.push(team);
         }
         League {
             name: "The League",
             num_teams: TEAMS.len(),
+            teams: teams,
             standings: standings,
         }
     }
@@ -125,5 +130,9 @@ impl League {
     pub fn standings(&mut self) -> &Vec<TeamStats> {
         self.standings.sort();
         return &self.standings;
+    }
+
+    pub fn teams(&mut self) -> &Vec<Team> {
+        return &self.teams;
     }
 }
