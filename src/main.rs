@@ -13,7 +13,11 @@ fn main() {
     loop {
         let mut l = league::League::new();
 
-        schedule(&mut l);
+        let schedule = schedule(&mut l);
+        for game in schedule.iter() {
+            let result = simulation::simulate_game(game);
+            println!("{}", result);
+        }
         //let gr = simulation::simulate_game(team1, team2);
         println!("Play another match? (Yes/no)");
 

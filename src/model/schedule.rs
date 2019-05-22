@@ -1,9 +1,7 @@
 use crate::model::game::Game;
 use crate::model::league::League;
-use crate::model::team::Team;
 
 use itertools::Itertools;
-use std::collections::HashMap;
 
 pub fn schedule(league: &mut League) -> Vec<Game> {
     let teams = league.teams().to_vec();

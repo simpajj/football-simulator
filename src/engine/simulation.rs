@@ -2,7 +2,7 @@ use rand::distributions::Poisson;
 use rand::distributions::WeightedIndex;
 use rand::prelude::*;
 
-use crate::engine::game;
+use crate::model::game;
 use crate::model::team::Team;
 
 const MATCH_IMPORTANCE: f64 = 5.0;
@@ -24,9 +24,9 @@ impl ResultPoints {
 }
 
 // http://www.worldcup-simulator.de/static/data/Dormagen_2014_World_Cup_Simulator_2014-05-29.pdf
-pub fn simulate_game<'a>(home_team: &'a Team, away_team: &'a Team) -> Box<game::Result> {
-    let p_home: f64 = win_probability(home_team.rating() - away_team.rating());
-    let p_away: f64 = win_probability(away_team.rating() - home_team.rating());
+pub fn simulate_game<'a>(game: &'a game::Game) -> Box<game::Game> {
+    let p_home: f64 = win_probability(game.home_team.rating() - game.away_team.rating());
+    let p_away: f64 = win_probability(game.away_team.rating() - game.home_team.rating());
     let p_draw: f64 = draw_probability(p_home, p_away);
 
     let outcome = choose_outcome(p_home, p_away, p_draw);
@@ -34,53 +34,54 @@ pub fn simulate_game<'a>(home_team: &'a Team, away_team: &'a Team) -> Box<game::
 
     match outcome {
         game::Outcome::HomeWin => {
-            let ht = Team::update_rating(
-                home_team,
+            Team::update_rating(
+                &game.home_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Win.value(),
                 p_home,
             );
-            let at = Team::update_rating(
-                away_team,
+            Team::update_rating(
+                &game.away_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Defeat.value(),
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game::WinLossResult::new(ht, at, score.0, score.1, ht, at));
+            return Box::new(game.copy(score.0, score.1));
         }
         game::Outcome::AwayWin => {
-            let ht = Team::update_rating(
-                home_team,
+            Team::update_rating(
+                &game.home_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Defeat.value(),
                 p_home,
             );
-            let at = Team::update_rating(
-                away_team,
+            Team::update_rating(
+                &game.away_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Win.value(),
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game::WinLossResult::new(ht, at, score.0, score.1, at, ht));
+            return Box::new(game.copy(score.0, score.1));
         }
         game::Outcome::Draw => {
-            let ht = Team::update_rating(
-                home_team,
+            Team::update_rating(
+                &game.home_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Draw.value(),
                 p_home,
             );
-            let at = Team::update_rating(
-                away_team,
+            Team::update_rating(
+                &game.away_team,
                 MATCH_IMPORTANCE,
                 ResultPoints::Draw.value(),
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game::DrawResult::new(ht, at, score.0, score.1));
+            return Box::new(game.copy(score.0, score.1));
         }
+        _ => return Box::new(game.copy(game.home_team_score, game.away_team_score)),
     };
 }
 
@@ -136,5 +137,6 @@ fn score(normalized_probability: f64, outcome: game::Outcome) -> (u64, u64) {
             a_score = h_score;
             return (h_score, a_score);
         }
+        _ => return (h_score, a_score),
     }
 }
