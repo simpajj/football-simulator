@@ -24,7 +24,7 @@ impl ResultPoints {
 }
 
 // http://www.worldcup-simulator.de/static/data/Dormagen_2014_World_Cup_Simulator_2014-05-29.pdf
-pub fn simulate_game<'a>(game: &'a game::Game) -> Box<game::Game> {
+pub fn simulate_game<'a>(game: &'a game::Game) -> game::Game {
     let p_home: f64 = win_probability(game.home_team.rating() - game.away_team.rating());
     let p_away: f64 = win_probability(game.away_team.rating() - game.home_team.rating());
     let p_draw: f64 = draw_probability(p_home, p_away);
@@ -47,7 +47,7 @@ pub fn simulate_game<'a>(game: &'a game::Game) -> Box<game::Game> {
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game.copy(score.0, score.1));
+            return game.copy(score.0, score.1);
         }
         game::Outcome::AwayWin => {
             Team::update_rating(
@@ -63,7 +63,7 @@ pub fn simulate_game<'a>(game: &'a game::Game) -> Box<game::Game> {
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game.copy(score.0, score.1));
+            return game.copy(score.0, score.1);
         }
         game::Outcome::Draw => {
             Team::update_rating(
@@ -79,9 +79,9 @@ pub fn simulate_game<'a>(game: &'a game::Game) -> Box<game::Game> {
                 p_away,
             );
             let score = score(normalized_probability, outcome);
-            return Box::new(game.copy(score.0, score.1));
+            return game.copy(score.0, score.1);
         }
-        _ => return Box::new(game.copy(game.home_team_score, game.away_team_score)),
+        _ => return game.copy(game.home_team_score, game.away_team_score),
     };
 }
 
@@ -108,32 +108,32 @@ fn choose_outcome(p_home: f64, p_away: f64, p_draw: f64) -> game::Outcome {
     return probabilities[index.sample(&mut thread_rng())].0;
 }
 
-fn score(normalized_probability: f64, outcome: game::Outcome) -> (u64, u64) {
+fn score(normalized_probability: f64, outcome: game::Outcome) -> (i64, i64) {
     let dist = 1.8 * normalized_probability + 0.27;
     let home_goals = Poisson::new(dist);
     let away_goals = Poisson::new(dist);
 
-    let mut h_score = 0;
-    let mut a_score = 0;
+    let mut h_score: i64 = 0;
+    let mut a_score: i64 = 0;
     let mut rng = thread_rng();
 
     match outcome {
         game::Outcome::HomeWin => {
             while h_score <= a_score {
-                h_score = home_goals.sample(&mut rng);
-                a_score = away_goals.sample(&mut rng);
+                h_score = home_goals.sample(&mut rng) as i64;
+                a_score = away_goals.sample(&mut rng) as i64;
             }
             return (h_score, a_score);
         }
         game::Outcome::AwayWin => {
             while h_score >= a_score {
-                h_score = home_goals.sample(&mut rng);
-                a_score = away_goals.sample(&mut rng);
+                h_score = home_goals.sample(&mut rng) as i64;
+                a_score = away_goals.sample(&mut rng) as i64;
             }
             return (h_score, a_score);
         }
         game::Outcome::Draw => {
-            h_score = home_goals.sample(&mut rng);
+            h_score = home_goals.sample(&mut rng) as i64;
             a_score = h_score;
             return (h_score, a_score);
         }

@@ -1,7 +1,10 @@
+use crate::model::game::Game;
 use crate::model::team::Team;
+
 use colored::*;
 use std::cmp::Ord;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
@@ -29,15 +32,16 @@ const TEAMS: [(&'static str, f64); 20] = [
     ("Prague FC", 2740.0),
 ];
 
-#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct TeamStats {
     pub team: Team,
+    games_played: i16,
     wins: u16,
     draws: u16,
     losses: u16,
-    goals_for: u64,
-    goals_against: u64,
-    goal_difference: u64,
+    goals_for: i64,
+    goals_against: i64,
+    goal_difference: i64,
     points: u64,
 }
 
@@ -47,12 +51,19 @@ impl Ord for TeamStats {
     }
 }
 
+impl PartialOrd for TeamStats {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 impl Display for TeamStats {
     fn fmt(&self, f: &mut Formatter) -> Result {
         writeln!(
             f,
-            "{0: <20} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10}",
+            "{0: <20} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | {8: <10}",
             self.team.name,
+            self.games_played,
             self.wins,
             self.draws,
             self.losses,
@@ -68,6 +79,7 @@ impl TeamStats {
     fn new(team: Team) -> TeamStats {
         TeamStats {
             team: team,
+            games_played: 0,
             wins: 0,
             draws: 0,
             losses: 0,
@@ -77,6 +89,22 @@ impl TeamStats {
             points: 0,
         }
     }
+
+    fn update<'a>(&'a mut self, gf: i64, ga: i64) {
+        self.games_played = self.games_played + 1;
+        self.goals_for = self.goals_for + gf;
+        self.goals_against = self.goals_against + ga;
+        self.goal_difference = self.goal_difference + (gf - ga);
+        if gf > ga {
+            self.points = self.points + 3;
+            self.wins = self.wins + 1;
+        } else if ga == gf {
+            self.points = self.points + 1;
+            self.draws = self.draws + 1;
+        } else {
+            self.losses = self.losses + 1;
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -84,7 +112,7 @@ pub struct League {
     name: &'static str,
     num_teams: usize,
     teams: Vec<Team>,
-    pub standings: Vec<TeamStats>,
+    pub standings: HashMap<&'static str, TeamStats>,
 }
 
 impl Display for League {
@@ -93,8 +121,9 @@ impl Display for League {
         let mut res: Result = Ok(());
         res = writeln!(
             f,
-            "{0: <20} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10}",
+            "{0: <20} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | {8: <10}",
             "Team".bold(),
+            "GP".bold(),
             "Wins".bold(),
             "Draws".bold(),
             "Losses".bold(),
@@ -103,7 +132,8 @@ impl Display for League {
             "GD".bold(),
             "Points".bold()
         );
-        for team in league.standings {
+        let standings = league.standings();
+        for team in standings {
             res = write!(f, "{}", team)
         }
         return res;
@@ -112,11 +142,11 @@ impl Display for League {
 
 impl League {
     pub fn new() -> League {
-        let mut standings: Vec<TeamStats> = Vec::new();
+        let mut standings: HashMap<&'static str, TeamStats> = HashMap::new();
         let mut teams: Vec<Team> = Vec::new();
         for team in TEAMS.iter() {
             let team = Team::new(team.0, team.1);
-            standings.push(TeamStats::new(team));
+            standings.insert(team.name, TeamStats::new(team));
             teams.push(team);
         }
         League {
@@ -127,9 +157,21 @@ impl League {
         }
     }
 
-    pub fn standings(&mut self) -> &Vec<TeamStats> {
-        self.standings.sort();
-        return &self.standings;
+    pub fn standings(&self) -> Vec<TeamStats> {
+        let mut standings: Vec<TeamStats> = self.standings.iter().map(|(_, v)| v.clone()).collect();
+        standings.sort();
+        standings.reverse();
+        return standings.clone();
+    }
+
+    pub fn update_standings<'a>(&'a mut self, game: Game) {
+        self.standings
+            .entry(game.home_team.name)
+            .and_modify(|x| x.update(game.home_team_score, game.away_team_score));
+
+        self.standings
+            .entry(game.away_team.name)
+            .and_modify(|x| x.update(game.away_team_score, game.home_team_score));
     }
 
     pub fn teams(&mut self) -> &Vec<Team> {

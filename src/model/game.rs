@@ -16,8 +16,8 @@ pub struct Game {
     season: u64,
     pub home_team: Team,
     pub away_team: Team,
-    pub home_team_score: u64,
-    pub away_team_score: u64,
+    pub home_team_score: i64,
+    pub away_team_score: i64,
     pub winner: Option<Team>,
     pub loser: Option<Team>,
     pub outcome: Outcome,
@@ -61,7 +61,7 @@ impl Game {
         }
     }
 
-    pub fn copy(&self, home_team_score: u64, away_team_score: u64) -> Game {
+    pub fn copy(&self, home_team_score: i64, away_team_score: i64) -> Game {
         let (outcome, winner, loser) = if home_team_score > away_team_score {
             (Outcome::HomeWin, Some(self.home_team), Some(self.away_team))
         } else if away_team_score > home_team_score {
