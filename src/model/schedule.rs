@@ -1,6 +1,16 @@
-use crate::model::game;
+use crate::model::game::Game;
+use crate::model::league::League;
+use crate::model::team::Team;
+
+use itertools::Itertools;
 use std::collections::HashMap;
 
-pub struct Schedule {
-    rounds: HashMap<u8, Vec<game::Game>>,
+pub fn schedule(league: &mut League) -> Vec<Game> {
+    let teams = league.teams().to_vec();
+    teams
+        .iter()
+        .cartesian_product(&teams)
+        .filter(|x| !((x.0).name == (x.1).name))
+        .map(|x| Game::new(0, 0, *x.0, *x.1))
+        .collect()
 }

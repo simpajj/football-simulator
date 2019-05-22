@@ -1,11 +1,21 @@
 use std::cmp::PartialEq;
 use uuid::Uuid;
 
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result;
+
 #[derive(Debug, Clone, Copy, PartialOrd)]
 pub struct Team {
   pub id: Uuid,
   pub name: &'static str,
   pub rating: f64,
+}
+
+impl Display for Team {
+  fn fmt(&self, f: &mut Formatter) -> Result {
+    write!(f, "{}", self.name())
+  }
 }
 
 impl PartialEq for Team {
