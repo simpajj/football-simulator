@@ -43,13 +43,13 @@ impl Team {
     self.rating
   }
 
-  pub fn update_rating<'a>(
-    team: &'a Team,
+  pub fn update_rating(
+    mut self,
     match_importance: f64,
     match_result: f64,
     win_probability: f64,
-  ) -> Team {
-    let rating = team.rating + match_importance * (match_result - win_probability).round();
-    return Team::new(team.name(), rating);
+  ) -> Self {
+    self.rating = self.rating + match_importance * (match_result - win_probability).round();
+    self
   }
 }

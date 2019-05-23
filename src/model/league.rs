@@ -9,31 +9,6 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
-use uuid::Uuid;
-
-const TEAMS: [(&'static str, f64); 20] = [
-    ("London City", 2875.4),
-    ("Manchester Albion", 2770.9),
-    ("Borussia Berlin", 2759.0),
-    ("Sporting Madrid", 2805.0),
-    ("AC Roma", 2759.8),
-    ("Olympique de Paris", 2774.4),
-    ("SV München", 2779.4),
-    ("Real Barcelona", 2818.7),
-    ("Istanbul SK", 2752.4),
-    ("FC Moscow", 2753.0),
-    ("Liverpool Wanderers", 2777.1),
-    ("Atletico Sevilla", 2760.6),
-    ("AS Milano", 2760.0),
-    ("SSD Napoli", 2777.1),
-    ("AFC Amsterdam", 2767.5),
-    ("Brussels FC", 2742.2),
-    ("IFK Stockholm", 2747.6),
-    ("Köpenhamn FK", 2753.5),
-    ("Vienna FC", 2740.7),
-    ("Prague FC", 2740.0),
-];
-
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct TeamStats {
     pub team: &'static str,
@@ -92,7 +67,7 @@ impl TeamStats {
         }
     }
 
-    fn update<'a>(&'a mut self, gf: i64, ga: i64) {
+    fn update(&mut self, gf: i64, ga: i64) {
         self.games_played = self.games_played + 1;
         self.goals_for = self.goals_for + gf;
         self.goals_against = self.goals_against + ga;
@@ -113,7 +88,6 @@ impl TeamStats {
 pub struct League {
     name: &'static str,
     num_teams: usize,
-    teams: HashMap<Uuid, Team>,
     pub standings: HashMap<&'static str, TeamStats>,
 }
 
@@ -143,18 +117,15 @@ impl Display for League {
 }
 
 impl League {
-    pub fn new() -> League {
-        let mut standings: HashMap<&'static str, TeamStats> = HashMap::new();
-        let mut teams: HashMap<Uuid, Team> = HashMap::new();
-        for team in TEAMS.iter() {
-            let team = Team::new(team.0, team.1);
-            standings.insert(team.name, TeamStats::new(team.name));
-            teams.insert(team.id, team);
-        }
+    pub fn new(teams: Vec<&Team>) -> League {
+        let standings: HashMap<&'static str, TeamStats> = teams
+            .iter()
+            .map(|t| (t.name, TeamStats::new(t.name)))
+            .collect();
+
         League {
             name: "The League",
-            num_teams: TEAMS.len(),
-            teams: teams,
+            num_teams: teams.len(),
             standings: standings,
         }
     }
@@ -166,17 +137,13 @@ impl League {
         return standings.clone();
     }
 
-    pub fn update_standings<'a>(&'a mut self, game: Game) {
+    pub fn update_standings(&mut self, game: Game) {
         self.standings
-            .entry(game.home_team.name)
+            .entry(game.home_team_name)
             .and_modify(|x| x.update(game.home_team_score, game.away_team_score));
 
         self.standings
-            .entry(game.away_team.name)
+            .entry(game.away_team_name)
             .and_modify(|x| x.update(game.away_team_score, game.home_team_score));
-    }
-
-    pub fn teams(&self) -> HashMap<Uuid, Team> {
-        return self.teams.clone();
     }
 }
