@@ -9,6 +9,8 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
+use uuid::Uuid;
+
 const TEAMS: [(&'static str, f64); 20] = [
     ("London City", 2875.4),
     ("Manchester Albion", 2770.9),
@@ -34,7 +36,7 @@ const TEAMS: [(&'static str, f64); 20] = [
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct TeamStats {
-    pub team: Team,
+    pub team: &'static str,
     games_played: i16,
     wins: u16,
     draws: u16,
@@ -62,7 +64,7 @@ impl Display for TeamStats {
         writeln!(
             f,
             "{0: <20} | {1: <10} | {2: <10} | {3: <10} | {4: <10} | {5: <10} | {6: <10} | {7: <10} | {8: <10}",
-            self.team.name,
+            self.team,
             self.games_played,
             self.wins,
             self.draws,
@@ -76,7 +78,7 @@ impl Display for TeamStats {
 }
 
 impl TeamStats {
-    fn new(team: Team) -> TeamStats {
+    fn new(team: &'static str) -> TeamStats {
         TeamStats {
             team: team,
             games_played: 0,
@@ -111,7 +113,7 @@ impl TeamStats {
 pub struct League {
     name: &'static str,
     num_teams: usize,
-    teams: Vec<Team>,
+    teams: HashMap<Uuid, Team>,
     pub standings: HashMap<&'static str, TeamStats>,
 }
 
@@ -143,11 +145,11 @@ impl Display for League {
 impl League {
     pub fn new() -> League {
         let mut standings: HashMap<&'static str, TeamStats> = HashMap::new();
-        let mut teams: Vec<Team> = Vec::new();
+        let mut teams: HashMap<Uuid, Team> = HashMap::new();
         for team in TEAMS.iter() {
             let team = Team::new(team.0, team.1);
-            standings.insert(team.name, TeamStats::new(team));
-            teams.push(team);
+            standings.insert(team.name, TeamStats::new(team.name));
+            teams.insert(team.id, team);
         }
         League {
             name: "The League",
@@ -174,7 +176,7 @@ impl League {
             .and_modify(|x| x.update(game.away_team_score, game.home_team_score));
     }
 
-    pub fn teams(&mut self) -> &Vec<Team> {
-        return &self.teams;
+    pub fn teams(&self) -> HashMap<Uuid, Team> {
+        return self.teams.clone();
     }
 }

@@ -20,6 +20,9 @@ fn main() {
             l.update_standings(result);
         }
         println!("{}", l);
+        for team in l.teams().iter() {
+            println!("{}, {}", team.1.name, team.1.rating)
+        }
 
         // todo: make current ranking dependent on squad (implement team squad, players and player ratings)
         // todo: player development (ranking increase/decrease based on player age, training and match performance)
