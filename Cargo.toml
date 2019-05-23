@@ -1,5 +1,5 @@
 [package]
-name = "simmy-dimmy"
+name = "football-simulator"
 version = "0.0.1"
 authors = ["Simon Salloum"]
 edition = "2018"

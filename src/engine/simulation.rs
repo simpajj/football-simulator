@@ -112,6 +112,5 @@ fn score(normalized_probability: f64, outcome: game::Outcome) -> (i64, i64) {
             a_score = h_score;
             return (h_score, a_score);
         }
-        _ => return (h_score, a_score),
     }
 }

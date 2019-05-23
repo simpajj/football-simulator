@@ -1,11 +1,11 @@
+extern crate football_simulator;
 extern crate rand;
-extern crate simmy_dimmy;
 
-pub use simmy_dimmy::engine::simulation;
-pub use simmy_dimmy::model::game::Game;
-pub use simmy_dimmy::model::league;
-pub use simmy_dimmy::model::league::TeamStats;
-pub use simmy_dimmy::model::team::Team;
+pub use football_simulator::engine::simulation;
+pub use football_simulator::model::game::Game;
+pub use football_simulator::model::league;
+pub use football_simulator::model::league::TeamStats;
+pub use football_simulator::model::team::Team;
 
 use std::collections::HashMap;
 use std::io;
