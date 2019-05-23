@@ -68,14 +68,15 @@ fn main() {
         .map(|team| (team.id, team))
         .collect();
 
+    let schedule: Vec<(Uuid, Uuid)> = teams
+        .iter()
+        .map(|(_, v)| v.id)
+        .cartesian_product(teams.iter().map(|(_, v)| v.id))
+        .filter(|x| !(x.0 == x.1))
+        .collect();
+
     for _ in 0..seasons {
         let mut l = league::League::new(teams.iter().map(|t| t.1).collect_vec());
-        let schedule: Vec<(Uuid, Uuid)> = teams
-            .iter()
-            .map(|(_, v)| v.id)
-            .cartesian_product(teams.iter().map(|(_, v)| v.id))
-            .filter(|x| !(x.0 == x.1))
-            .collect();
 
         for t in schedule.iter() {
             let (result, ht, at) =
@@ -84,15 +85,12 @@ fn main() {
             teams.insert(at.id, at);
             l.update_standings(result);
         }
-        /*println!("{}", l);
-        for team in teams.iter() {
-            println!("{}, {}", team.1.name, team.1.rating)
-        }*/
 
         winners
             .entry(l.leader().team)
             .and_modify(|e| *e += 1)
             .or_insert(1);
+
         // todo: player development (ranking increase/decrease based on player age, training and match performance)
         // todo: make team ranking dependent on squad (implement team squad, players and player ratings)
         // parallelize certain operations using Rayon (https://github.com/rayon-rs/rayon)?
