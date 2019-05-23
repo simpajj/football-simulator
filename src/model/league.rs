@@ -137,6 +137,10 @@ impl League {
         return standings.clone();
     }
 
+    pub fn leader(&self) -> TeamStats {
+        *self.standings().first().unwrap()
+    }
+
     pub fn update_standings(&mut self, game: Game) {
         self.standings
             .entry(game.home_team_name)
