@@ -88,6 +88,7 @@ impl TeamStats {
 pub struct League {
     name: &'static str,
     num_teams: usize,
+    pub season: i64,
     pub standings: HashMap<&'static str, TeamStats>,
 }
 
@@ -117,7 +118,7 @@ impl Display for League {
 }
 
 impl League {
-    pub fn new(teams: Vec<&Team>) -> League {
+    pub fn new(teams: Vec<&Team>, season: i64) -> League {
         let standings: HashMap<&'static str, TeamStats> = teams
             .iter()
             .map(|t| (t.name, TeamStats::new(t.name)))
@@ -126,6 +127,7 @@ impl League {
         League {
             name: "The League",
             num_teams: teams.len(),
+            season: season,
             standings: standings,
         }
     }
