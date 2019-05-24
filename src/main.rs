@@ -13,6 +13,7 @@ pub use football_simulator::model::team::Team;
 use std::collections::HashMap;
 use std::io;
 
+use indicatif::ProgressBar;
 use itertools::Itertools;
 use uuid::Uuid;
 
@@ -61,6 +62,7 @@ fn main() {
 
     let mut seasons: u64 = 0;
     println!("Enter the number of seasons that you want to simulate (min. 1):");
+
     while seasons <= 0 {
         let mut input = String::new();
         io::stdin()
@@ -95,7 +97,8 @@ fn main() {
         .cartesian_product(teams.iter().map(|(_, v)| v.id))
         .filter(|x| !(x.0 == x.1))
         .collect();
-
+    
+    let pb = ProgressBar::new(seasons);
     for season in 1..seasons + 1 {
         let mut l = league::League::new(teams.values().collect_vec(), season as i64);
 
@@ -113,13 +116,14 @@ fn main() {
             .or_insert(1);
 
         standings.insert(season as i64, l);
+        pb.inc(1);
 
         // todo: player development (ranking increase/decrease based on player age, training and match performance)
         // todo: make team ranking dependent on squad (implement team squad, players and player ratings)
         // parallelize certain operations using Rayon (https://github.com/rayon-rs/rayon)?
     }
 
-    println!("All seasons simulated!");
+    pb.finish_with_message("All seasons simulated!");
     println!("{}", *HELP);
     let mut exit = false;
     while !exit {
